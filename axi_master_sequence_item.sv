@@ -1,10 +1,8 @@
 //  Class: axi_sequence_item
 //
-`include "uvm_macros.svh"
-import uvm_pkg::*;
+
 
 class axi_sequence_item extends uvm_sequence_item;
-    
 
     //  Group: Variables
 
@@ -19,7 +17,7 @@ class axi_sequence_item extends uvm_sequence_item;
     //logic[] 	        AXI_AWCACHE;
     //logic[] 	        AXI_AWPROT;
     //logic[] 		    AXI_AWQOS;
-    rand bit 	        AXI_AWVALID;
+    bit  	            AXI_AWVALID;
     bit 	            AXI_AWREADY;
 
 	// AXI data write phase
@@ -27,14 +25,14 @@ class axi_sequence_item extends uvm_sequence_item;
     rand bit[31:0]      AXI_WDATA;
     //rand bit[]  	    AXI_WSTRB;
     //rand bit[]  	    AXI_WLAST;
-    rand bit            AXI_WVALID;
+    bit                 AXI_WVALID;
     bit 	            AXI_WREADY;
 
 	// AXI response write phase
     logic[2:0]   	    AXI_BID;
     logic[1:0] 	        AXI_BRESP;
-    logic               AXI_BVALID;
-    rand logic	        AXI_BREADY;
+    bit               AXI_BVALID;
+    bit	        AXI_BREADY;
 
     //  Group: Functions
 
@@ -44,6 +42,8 @@ class axi_sequence_item extends uvm_sequence_item;
     endfunction: new
 
     `uvm_object_utils(axi_sequence_item)
+
+
     //  Function: do_copy
     // extern function void do_copy(uvm_object rhs);
     //  Function: do_compare

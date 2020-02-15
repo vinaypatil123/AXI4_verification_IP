@@ -2,9 +2,11 @@
 //
 class axi_master_monitor extends uvm_monitor;
 
-    virtual axi_interface axi_monitor_vif;
+    virtual axi_interface axi_vif;
 
     longint monitor_cycle   =   0;
+
+    `uvm_component_utils(axi_master_monitor)    
 
     uvm_analysis_port #(axi_sequence_item) item_collected_port;
 
@@ -17,8 +19,8 @@ class axi_master_monitor extends uvm_monitor;
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
         
-        if(uvm_config_db#(virtual axi_interface)::get(this, , "axi_monitor_vif", axi_monitor_vif));
-        `uvm_error("NOVIF", {"Virtual interface must be set for the Monitor",get_full_name(),".axi_monitor_vif"})
+        if(!uvm_config_db#(virtual axi_interface)::get(null, "*", "axi_vif", axi_vif))
+            `uvm_error("NOVIF",{"virtual interface must be set for: ",get_full_name(),"axi_vif"})
 
     endfunction: connect_phase
 

@@ -1,8 +1,6 @@
 //  Interface: axi_interface
 //
-interface axi_interface
-    /*  package imports  */
-    #(
+interface axi_interface #(
         parameter integer AXI_ID_WIDTH 	    = 10,
 		parameter integer AXI_ADDR_WIDTH 	= 32,
         //parameter integer AXI_REG_WITH      = 4,
