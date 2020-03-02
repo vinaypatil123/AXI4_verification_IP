@@ -4,12 +4,12 @@
 import uvm_pkg::*;
 
 `include "axi_interface.sv"
-`include "axi_master_configuration.sv"
 `include "axi_master_sequence_item.sv"
+`include "axi_master_configuration.sv"
 `include "axi_master_sequencer.sv"
 `include "axi_master_sequence.sv"
 `include "axi_master_driver.sv"
-`include "axi_master_monitor.sv"
+//`include "axi_master_monitor.sv"
 `include "axi_master_agent.sv"
 `include "axi_environment.sv"
 `include "axi_test.sv"
@@ -17,16 +17,18 @@ import uvm_pkg::*;
 module axi_top;
 
     bit clock;
-    axi_interface axi_intf(clock);
-    
+    bit reset;
+    axi_interface axi_intf(clock, reset);
 
-    initial begin
-        forever #10 clock = ~clock;
-    end
+    
+    always #10 clock = ~clock;
+    
     
     initial
     begin
-        uvm_config_db#(virtual axi_interface)::set(null ,"*", "axi_vif", axi_intf);
+        clock <=0;
+        uvm_top.set_report_verbosity_level(UVM_HIGH);
+        uvm_config_db#(virtual axi_interface)::set(null ,"*", "axi_interface", axi_intf);
         run_test("axi_test");
     end
 
