@@ -1,3 +1,3 @@
 vlog axi_top.sv
-vsim axi_top
-run
+vsim -novopt axi_top
+run 1500ns
