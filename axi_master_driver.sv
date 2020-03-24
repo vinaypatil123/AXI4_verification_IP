@@ -1,22 +1,27 @@
 //  Class: axi_driver
 //
 
-class axi_driver extends uvm_driver #(axi_sequence_item);
+class axi_master_driver extends uvm_driver #(axi_sequence_item);
     /*  PROPERTIES  */
-    `uvm_component_utils(axi_driver)
+    `uvm_component_utils(axi_master_driver)
 
     virtual axi_interface axi_vif;
     //int master_wrt_q[$];
     axi_sequence_item master_wrt_q[$];
     
     axi_sequence_item axi_seq_item_req;
+
+    int     index;
+    int     data_recieved;
+    int     strb_recieved;
+    //axi_sequence_item axi_seq_item_req_data;
     //axi_sequence_item master_transfer;
 
     //int unsigned                master_wr_addr_indx = 0;
     //int unsigned                master_wr_data_indx = 0;
 
 
-    function new(string name = "axi_driver", uvm_component parent = null);
+    function new(string name = "axi_master_driver", uvm_component parent = null);
         super.new(name,parent);
     endfunction: new  
     
@@ -37,27 +42,44 @@ class axi_driver extends uvm_driver #(axi_sequence_item);
     //extern virtual task reset_signals();
     //extern virtual task send_wrt_addr();
     //extern virtual task send_wrt_data();
-    extern virtual task full_write();
+    extern virtual task master_write_addr();
+    extern virtual task master_write_data();
+    extern virtual task master_write_resp();
     
     
 
-endclass: axi_driver
+endclass: axi_master_driver
 
-task axi_driver::run_phase(uvm_phase phase);
+task axi_master_driver::run_phase(uvm_phase phase);
     super.run_phase(phase);
-    repeat(10) begin
-        `uvm_info(get_type_name(), $sformatf("Waiting for data from sequencer"), UVM_NONE)
+    repeat(50) begin
+        //@(posedge axi_vif.clock);
         seq_item_port.get_next_item(axi_seq_item_req);
         //get_and_drive();    
-            full_write();
-        axi_seq_item_req.print();
+        
+        `uvm_info(get_type_name(), $sformatf("Waiting for data from sequencer"), UVM_NONE)
+        fork
+            //master_write_addr();
+        //@(posedge axi_vif.clock);
+            master_write_data();
+        join
+        
+        //axi_seq_item_req.print();
+
+
         seq_item_port.item_done();    
     end
 endtask : run_phase
 
-task axi_driver::full_write();
+task axi_master_driver::master_write_addr();
     begin
-        //axi_seq_item_req.print();
+        axi_seq_item_req = axi_sequence_item::type_id::create("axi_seq_item_req");
+
+        axi_vif.AWADDR          <=  1'b0;
+        axi_vif.AWLEN           <=  1'b0;
+        axi_vif.AWSIZE          <=  1'b0;
+        axi_vif.AWBURST         <=  1'b0;
+        
        /* @(posedge axi_vif.clock); begin
             axi_vif.AWID            <=  0;
             axi_vif.AWADDR          <=  0;
@@ -76,30 +98,108 @@ task axi_driver::full_write();
             axi_vif.BRESP           <=  0;
         end*/
         @(posedge axi_vif.clock); 
-            axi_vif.AWID            <=  axi_seq_item_req.AXI_AWID;
+            axi_vif.AWVALID         <=  1'b1;       
+        //axi_vif.AWID            <=  axi_seq_item_req.AXI_AWID;
             axi_vif.AWADDR          <=  axi_seq_item_req.AXI_AWADDR;
             axi_vif.AWLEN           <=  axi_seq_item_req.AXI_AWLEN;
             axi_vif.AWSIZE          <=  axi_seq_item_req.AXI_AWSIZE;
             axi_vif.AWBURST         <=  axi_seq_item_req.AXI_AWBURST;
-            axi_vif.AWREG           <=  axi_seq_item_req.AXI_AWREG;
-            axi_vif.AWLOCK          <=  axi_seq_item_req.AXI_AWLOCK;
-            axi_vif.AWCACHE         <=  axi_seq_item_req.AXI_AWCACHE;
-            axi_vif.AWPROT          <=  axi_seq_item_req.AXI_AWPROT;
-            axi_vif.AWQOS           <=  axi_seq_item_req.AXI_AWQOS;
+            //axi_vif.AWREG           <=  axi_seq_item_req.AXI_AWREG;
+            //axi_vif.AWLOCK          <=  axi_seq_item_req.AXI_AWLOCK;
+            //axi_vif.AWCACHE         <=  axi_seq_item_req.AXI_AWCACHE;
+            //axi_vif.AWPROT          <=  axi_seq_item_req.AXI_AWPROT;
+            //axi_vif.AWQOS           <=  axi_seq_item_req.AXI_AWQOS;
             //axi_vif.WDATA           <=  axi_seq_item_req.AXI_WDATA;
             //axi_vif.WSTRB           <=  axi_seq_item_req.AXI_WSTRB;
-            //axi_vif.WLAST           <=  axi_seq_item_req.AXI_WLAST;
+            //axi_vif.WLAST           <=  1'b0;
+            //axi_vif.WVALID          <=  1'b0;
             //axi_vif.BID             <=  axi_seq_item_req.AXI_BID;
             //axi_vif.BRESP           <=  axi_seq_item_req.AXI_BRESP;
         
-            $display("\t Address = %0h", axi_vif.AWADDR);
+        //$display("\t Address = %0h", axi_vif.AWADDR);
+        //@(posedge axi_vif.clock);
         
+        wait(axi_vif.AWREADY == 1'b1)
+        @(posedge axi_vif.clock);
+        wait(axi_vif.AWREADY == 1'b0)
+        axi_vif.AWVALID         <=  1'b0;
+        
+        //data not available after valid asserted to 0
+        axi_vif.AWADDR          <=  1'b0;
+        axi_vif.AWLEN           <=  1'b0;
+        axi_vif.AWSIZE          <=  1'b0;
+        axi_vif.AWBURST         <=  1'b0;
+
+        //@(posedge axi_vif.clock);
+
+        //master_write_data();
+
         //@(posedge axi_vif.clock);
     end
-endtask: full_write
+endtask: master_write_addr
+task axi_master_driver::master_write_data();
+    begin
+        axi_seq_item_req = axi_sequence_item::type_id::create("axi_seq_item_req");
+            
+        axi_vif.WLAST           <=      1'b0;
+
+        @(posedge axi_vif.clock);
+        //seq_item_port.get_next_item(axi_seq_item_req);
+        //begin
+            //axi_vif.WDATA           <=      axi_seq_item_req.AXI_WDATA;
+            //axi_vif.WLAST           <=      1'b0;
+
+
+            repeat(axi_seq_item_req.AXI_AWLEN)
+            begin
+                
+                axi_vif.WDATA           <=      1'b0;
+                axi_vif.WSTRB           <=      1'b0;
+                //@(posedge axi_vif.clock);
+                void'(axi_seq_item_req.randomize(AXI_WDATA));
+
+                axi_vif.WVALID          <=      1'b1;
+                axi_vif.WDATA           <=      axi_seq_item_req.AXI_WDATA;
+                //axi_vif.WSTRB           <=      axi_seq_item_req.AXI_WSTRB;                
+
+                //@(posedge axi_vif.clock);
+                @(posedge axi_vif.clock);
+                wait(axi_vif.WREADY == 1'b1);
+                @(posedge axi_vif.clock);
+                wait(axi_vif.WREADY == 1'b0);
+                axi_vif.WVALID          <=      1'b0;
+                @(posedge axi_vif.clock);
+
+            end     
+            //@(posedge axi_vif.clock);
+        //seq_item_port.item_done();
+    end
+endtask: master_write_data
+
+task axi_master_driver::master_write_resp();
+    forever begin
+        wait(axi_vif.BVALID == 1'b1)
+        @(posedge axi_vif.clock);
+        axi_vif.BREADY          <=  1'b1;
+        @(negedge axi_vif.clock);
+        
+        if(index == axi_vif.AWLEN - 1)
+        begin
+
+        end
+        else begin
+
+        end
+        $display("\t Slave Data = %0h \t Slave Strb = %0h \n", data_recieved, strb_recieved);
+        @(posedge axi_vif.clock);
+        axi_vif.WREADY          <=  1'b0;
+        @(posedge axi_vif.clock);
+    end    
+endtask: master_write_resp
+
 
 /*
-task axi_driver::drive_item(axi_sequence_item axi_seq_item_req);
+task axi_master_driver::drive_item(axi_sequence_item axi_seq_item_req);
     begin
         fork
             //get_and_drive();
@@ -114,7 +214,7 @@ task axi_driver::drive_item(axi_sequence_item axi_seq_item_req);
 endtask: drive_item
 
 
-task axi_driver::get_and_drive();
+task axi_master_driver::get_and_drive();
     //forever begin
       // @(posedge axi_vif.reset);
        //`uvm_info(get_type_name, "waiting for reset", UVM_NONE)       
@@ -130,7 +230,7 @@ task axi_driver::get_and_drive();
     end
 endtask: get_and_drive
 
-task axi_driver::reset_signals();
+task axi_master_driver::reset_signals();
     forever begin 
         @(posedge axi_vif.clock);
         `uvm_info(get_type_name(), "Reset Started", UVM_NONE)
@@ -149,7 +249,7 @@ task axi_driver::reset_signals();
     end
 endtask: reset_signals
 
-task axi_driver::send_wrt_addr();
+task axi_master_driver::send_wrt_addr();
     repeat(100) begin
         //repeat(master_wrt_q.size()==0)
         @(posedge axi_vif.clock);
@@ -174,7 +274,7 @@ task axi_driver::send_wrt_addr();
     end
 endtask: send_wrt_addr
 
-task axi_driver::send_wrt_data();
+task axi_master_driver::send_wrt_data();
     int unsigned i;
     axi_sequence_item axi_seq_item_req;
     forever begin

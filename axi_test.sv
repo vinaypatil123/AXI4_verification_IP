@@ -16,7 +16,7 @@ class axi_test extends uvm_test;
 
         //`uvm_field_object (axi_env,      UVM_DEFAULT)
         //`uvm_field_object (axi_test_seq, UVM_DEFAULT)
-    //`uvm_component_utils_end
+        //`uvm_component_utils_end
     
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);

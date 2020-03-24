@@ -6,7 +6,7 @@ class axi_master_agent extends uvm_agent;
     virtual axi_interface axi_agent_vif;
 
     uvm_sequencer #(axi_sequence_item) axi_m_sqr;
-    axi_driver axi_m_drv;
+    axi_master_driver axi_m_drv;
     //axi_master_monitor axi_m_mon;
     axi_master_configuration axi_m_config;
 
@@ -24,7 +24,7 @@ class axi_master_agent extends uvm_agent;
         if(axi_m_config.is_active == UVM_ACTIVE)
         begin
             axi_m_sqr = axi_sequencer::type_id::create("axi_m_sqr", this);
-            axi_m_drv = axi_driver::type_id::create("axi_m_drv", this);
+            axi_m_drv = axi_master_driver::type_id::create("axi_m_drv", this);
             
         end
         

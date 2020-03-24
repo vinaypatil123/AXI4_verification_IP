@@ -43,6 +43,8 @@ class axi_sequence_item extends uvm_sequence_item;
     endfunction: new
 
     
+
+    
     //  Function: do_copy
     // extern function void do_copy(uvm_object rhs);
     //  Function: do_compare

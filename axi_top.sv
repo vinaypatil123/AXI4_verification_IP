@@ -9,8 +9,10 @@ import uvm_pkg::*;
 `include "axi_master_sequencer.sv"
 `include "axi_master_sequence.sv"
 `include "axi_master_driver.sv"
+`include "axi_slave_driver.sv"
 //`include "axi_master_monitor.sv"
 `include "axi_master_agent.sv"
+`include "axi_slave_agent.sv"
 `include "axi_environment.sv"
 `include "axi_test.sv"
 
@@ -21,7 +23,7 @@ module axi_top;
     axi_interface axi_intf(clock, reset);
 
     
-    always #10 clock = ~clock;
+    always #1 clock = ~clock;
     
     
     initial
