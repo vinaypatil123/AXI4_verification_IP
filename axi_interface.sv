@@ -30,5 +30,28 @@ interface axi_interface (input bit clock, input bit reset);
     logic 	        BVALID;
     logic           BREADY;
 
+    // AXI address read phase
+    logic [3:0]		ARID; //axi4 remove it
+    logic [31:0]	ARADDR;
+    logic [3:0]     ARREG;
+    logic [7:0]		ARLEN;
+    logic [2:0]	    ARSIZE;
+    logic [1:0]	    ARBURST;
+    logic 	        ARLOCK;
+    logic [3:0]	    ARCACHE;
+    logic [2:0]	    ARPROT;
+    logic [3:0]		ARQOS;
+    logic 	        ARVALID;
+    logic 	        ARREADY;
+
+    // AXI data read phase
+    logic [3:0]     RID;
+    logic [31:0]	RDATA;
+    logic [3:0]	    RRESP;
+    logic           RLAST;
+
+    logic           RVALID;
+    logic 	        RREADY;
+
     
 endinterface: axi_interface

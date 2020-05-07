@@ -1,31 +1,30 @@
 //  Class: axi_master_agent
 //
-class axi_slave_agent extends uvm_agent;
-    `uvm_component_utils(axi_slave_agent)    
+class axi_slave_agent_read extends uvm_agent;
+    `uvm_component_utils(axi_slave_agent_read)    
     
     virtual axi_interface axi_agent_vif;
 
-    //uvm_sequencer #(axi_sequence_item) axi_s_sqr;
-    axi_sequencer axi_s_sqr;
-    axi_slave_driver axi_s_drv;
-    axi_master_monitor axi_m_mon;
+    uvm_sequencer #(axi_sequence_item_read) axi_s_sqr;
+    axi_slave_driver_read axi_s_drv;
+    //axi_master_monitor axi_m_mon;
     axi_master_configuration axi_s_config;
 
 
-    function new(string name = "axi_slave_agent", uvm_component parent = null);
+    function new(string name = "axi_slave_agent_read", uvm_component parent = null);
         super.new(name,parent);
     endfunction: new
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
-        axi_s_config    = axi_master_configuration::type_id::create("axi_s_config", this);
-        axi_m_mon       = axi_master_monitor::type_id::create("axi_m_mon", this);
+        axi_s_config = axi_master_configuration::type_id::create("axi_s_config", this);
+        //axi_m_mon = axi_master_monitor::type_id::create("axi_m_mon", this);
 
         if(axi_s_config.is_active == UVM_ACTIVE)
         begin
-            axi_s_sqr   = axi_sequencer::type_id::create("axi_s_sqr", this);
-            axi_s_drv   = axi_slave_driver::type_id::create("axi_s_drv", this);            
+            axi_s_sqr = axi_sequencer_read::type_id::create("axi_s_sqr", this);
+            axi_s_drv = axi_slave_driver_read::type_id::create("axi_s_drv", this);            
         end
         
     endfunction: build_phase
@@ -40,4 +39,4 @@ class axi_slave_agent extends uvm_agent;
     
     
 
-endclass: axi_slave_agent
+endclass: axi_slave_agent_read

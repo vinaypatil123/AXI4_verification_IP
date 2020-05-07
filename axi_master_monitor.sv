@@ -1,35 +1,34 @@
-//  Class: axi_master_monitor
+//  Class: axi_monitor
 //
 class axi_master_monitor extends uvm_monitor;
-
+    /*  PROPERTIES  */
+    `uvm_component_utils(axi_master_monitor)
+    
     virtual axi_interface axi_vif;
 
-    longint monitor_cycle   =   0;
+    uvm_analysis_port #(axi_sequence_item) item_collected_port; //analysis port
+    
+    axi_sequence_item trans_collected;  //to capture transaction information
 
-    `uvm_component_utils(axi_master_monitor)    
-
-    uvm_analysis_port #(axi_sequence_item) item_collected_port;
-
-    function new(string name = "axi_master_monitor", uvm_component parent = null);
+    function new(string name = "axi_monitor", uvm_component parent);
         super.new(name,parent);
-
-        item_collected_port = new("item_collected_port", this);
+        item_collected_port =   new("item_collected_port",this);
     endfunction: new
 
-    function void connect_phase(uvm_phase phase);
-        super.connect_phase(phase);
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
         
-        if(!uvm_config_db#(virtual axi_interface)::get(null, "*", "axi_vif", axi_vif))
-            `uvm_error("NOVIF",{"virtual interface must be set for: ",get_full_name(),"axi_vif"})
+        trans_collected = axi_sequence_item::type_id::create("trans_collected");
 
-    endfunction: connect_phase
-
-    task run_phase(uvm_phase phase);
-        fork
-
-        join        
+        if(!uvm_config_db#(virtual axi_interface)::get(this,"","axi_interface", axi_vif))
+        begin
+            `uvm_fatal(get_type_name(), "Didn't get handle to virtual interface")
+        end
+    endfunction: build_phase
+    
+    virtual task run_phase(uvm_phase phase);
+        super.run_phase(phase);
+        item_collected_port.write(trans_collected);
     endtask: run_phase
-    
-    
 
 endclass: axi_master_monitor
