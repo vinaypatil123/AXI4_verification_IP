@@ -165,31 +165,31 @@ endtask: master_write_addr
 
 task axi_master_driver::master_write_data();
     begin
-        int unsigned    i;
+        int         i;
         //axi_seq_item_req = axi_sequence_item::type_id::create("axi_seq_item_req");
             
         //axi_vif.WLAST           <=      1'b0;
         //axi_vif.WDATA           <=      1'b0;
         //axi_vif.WSTRB           <=      1'b0;
-        $display("Data at Master = %0h", axi_seq_item_req.AXI_WDATA);
+        //$display("Data at Master = %0h", axi_seq_item_req.AXI_WDATA);
         $display("Burst Len = %0t", axi_seq_item_req.AXI_AWLEN);
-        @(posedge axi_vif.clock);
+        //@(posedge axi_vif.clock);
         //seq_item_port.get_next_item(axi_seq_item_req);
         //begin
 
         for(i = 0; i < axi_seq_item_req.AXI_AWLEN; i++) begin
             //seq_item_port.get_next_item(axi_seq_item_req);
             begin
-                axi_seq_item_req = axi_sequence_item::type_id::create("axi_seq_item_req");
+                //axi_seq_item_req = axi_sequence_item::type_id::create("axi_seq_item_req");
 
                 //data_current            =       $urandom(axi_seq_item_req_data.AXI_WDATA);
                 axi_vif.WVALID          <=      1'b1;
-                axi_vif.WDATA           <=      axi_seq_item_req.mem_data.pop_front();//data_current;
+                axi_vif.WDATA           <=      axi_seq_item_req.mem_data[i];//data_current;
                 axi_vif.WSTRB           <=      axi_seq_item_req.AXI_WSTRB;
                 axi_vif.WLAST           <=      (i == axi_seq_item_req.AXI_AWLEN - 1)? 1'b1 : 1'b0;
 
-                @(posedge axi_vif.clock);
-                $display("\t\tData %0t = %0h", i, axi_vif.WDATA);
+                //@(posedge axi_vif.clock);
+                $display("\t\tData at Master %0d = %0h", i, axi_seq_item_req.mem_data[i]);
                 
                 wait(axi_vif.WREADY ==  1'b1);
                 @(posedge axi_vif.clock);

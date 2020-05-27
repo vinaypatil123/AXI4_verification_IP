@@ -55,14 +55,14 @@ endclass: axi_master_driver_read
 
 task axi_master_driver_read::run_phase(uvm_phase phase);
     super.run_phase(phase);
-    repeat(50) begin
+    begin
         //@(posedge axi_vif.clock);
         seq_item_port.get_next_item(axi_seq_item_req);
         //get_and_drive();    
         
-        `uvm_info(get_type_name(), $sformatf("Waiting for data from sequencer"), UVM_NONE)
+        `uvm_info(get_type_name(), $sformatf("Waiting for data from Slave"), UVM_NONE)
         //fork
-        master_read_addr();
+        //master_read_addr();
         //@(posedge axi_vif.clock);
         master_read_data();
 
@@ -129,26 +129,28 @@ task axi_master_driver_read::master_read_addr();
 endtask: master_read_addr
 
 task axi_master_driver_read::master_read_data();
-    forever begin
+    begin
         int unsigned    i;
         int             data_from_slave;
         //axi_seq_item_req = axi_sequence_item::type_id::create("axi_seq_item_req");
             
-        @(posedge axi_vif.clock);
+        //@(posedge axi_vif.clock);
         //axi_seq_item_req = axi_sequence_item_read::type_id::create("axi_seq_item_req");
 
         //data_current            =       $urandom(axi_seq_item_req_data.AXI_WDATA);
-        axi_vif.RREADY          <=      1'b1;
-        @(posedge axi_vif.clock);
-        wait(axi_vif.RVALID == 1'b1)
-        @(posedge axi_vif.clock);
-        data_from_slave         =      axi_vif.RDATA;//data_current;
-        //axi_vif.RSTRB           <=      axi_seq_item_req.AXI_RSTRB;
-        //axi_vif.RLAST           <=      (i == axi_seq_item_req.AXI_ARLEN - 1)? 1'b1 : 1'b0;
+        for(i = 0; i < axi_vif.AXI_ARLEN; i++) begin
+            axi_vif.RREADY          <=      1'b1;
+            @(posedge axi_vif.clock);
+            wait(axi_vif.RVALID == 1'b1)
+            @(posedge axi_vif.clock);
+            data_from_slave         =      axi_vif.RDATA;//data_current;
+            //axi_vif.RSTRB           <=      axi_seq_item_req.AXI_RSTRB;
+            //axi_vif.RLAST           <=      (i == axi_seq_item_req.AXI_ARLEN - 1)? 1'b1 : 1'b0;
 
-        @(negedge axi_vif.clock);
-        $display("\t\tData = %0h", data_from_slave);
-        axi_vif.RREADY          <=      1'b0;
+            //@(negedge axi_vif.clock);
+            $display("\t\tData at Master = %0h", data_from_slave);
+            axi_vif.RREADY          <=      1'b0;
+        end
     end
 endtask: master_read_data
 

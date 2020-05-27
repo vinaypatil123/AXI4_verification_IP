@@ -37,15 +37,15 @@ class axi_sequence_item extends uvm_sequence_item;
 
     //  Group: Functions
 
-    int                 mem_data[$];
-    int                 mem_addr[$];
+    rand bit[31:0]           mem_data [256];
+    rand bit[31:0]           mem_addr [256];
 
     //  Constructor: new
     function new(string name = "axi_sequence_item");
         super.new(name);
     endfunction: new
 
-    extern function void post_randomize();
+    //extern function void post_randomize();
 
     
     //  Function: do_copy
@@ -67,7 +67,7 @@ class axi_sequence_item extends uvm_sequence_item;
     
 endclass: axi_sequence_item
 
-function void axi_sequence_item::post_randomize();
+/*function void axi_sequence_item::post_randomize();
     begin
         for(int i = 0; i <= AXI_AWLEN - 1; i++)
         begin
@@ -75,4 +75,4 @@ function void axi_sequence_item::post_randomize();
         end
     end
             
-endfunction : post_randomize
+endfunction : post_randomize */

@@ -33,8 +33,8 @@ class axi_sequence_item_read extends uvm_sequence_item;
 
     //  Group: Functions
 
-    int                 mem_data;
-    int                 mem_addr;
+    rand bit[31:0]       mem_data_read [256];
+    rand bit[31:0]       mem_addr_read [256];
     
     //  Constructor: new
     function new(string name = "axi_sequence_item_read");
