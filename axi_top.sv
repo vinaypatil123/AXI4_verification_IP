@@ -30,7 +30,9 @@ module axi_top;
     begin
         clock <=0;
         uvm_top.set_report_verbosity_level(UVM_HIGH);
+
         uvm_config_db#(virtual axi_interface)::set(null ,"*", "axi_interface", axi_intf);
+        
         run_test("axi_test");
     end
 

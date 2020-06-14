@@ -61,13 +61,13 @@ task axi_master_driver_read::run_phase(uvm_phase phase);
         //get_and_drive();    
         
         `uvm_info(get_type_name(), $sformatf("Waiting for data from Slave"), UVM_NONE)
-        //fork
-        //master_read_addr();
-        //@(posedge axi_vif.clock);
-        master_read_data();
+        fork
+            master_read_addr();
+            //@(posedge axi_vif.clock);
+            master_read_data();
 
-        //master_write_resp();
-        //join
+            master_write_resp();
+        join
         
         //axi_seq_item_req.print();
 
@@ -129,30 +129,37 @@ task axi_master_driver_read::master_read_addr();
 endtask: master_read_addr
 
 task axi_master_driver_read::master_read_data();
-    begin
+    forever begin
         int unsigned    i;
         int             data_from_slave;
         //axi_seq_item_req = axi_sequence_item::type_id::create("axi_seq_item_req");
             
         //@(posedge axi_vif.clock);
         //axi_seq_item_req = axi_sequence_item_read::type_id::create("axi_seq_item_req");
+        //$display("Burst Len is = %0d", axi_vif.ARLEN);
 
         //data_current            =       $urandom(axi_seq_item_req_data.AXI_WDATA);
-        for(i = 0; i < axi_vif.AXI_ARLEN; i++) begin
+        for(i = 0; i < axi_vif.ARLEN; i++)
+        begin
+            
+            wait(axi_vif.RVALID == 1'b1);
             axi_vif.RREADY          <=      1'b1;
             @(posedge axi_vif.clock);
-            wait(axi_vif.RVALID == 1'b1)
-            @(posedge axi_vif.clock);
+            //wait(axi_vif.RVALID == 1'b1)
+            //@(posedge axi_vif.clock);
             data_from_slave         =      axi_vif.RDATA;//data_current;
             //axi_vif.RSTRB           <=      axi_seq_item_req.AXI_RSTRB;
             //axi_vif.RLAST           <=      (i == axi_seq_item_req.AXI_ARLEN - 1)? 1'b1 : 1'b0;
 
             //@(negedge axi_vif.clock);
             $display("\t\tData at Master = %0h", data_from_slave);
+            @(posedge axi_vif.clock);
             axi_vif.RREADY          <=      1'b0;
         end
     end
 endtask: master_read_data
+
+
 
 
 /*

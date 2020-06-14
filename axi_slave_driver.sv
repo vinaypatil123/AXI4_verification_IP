@@ -92,12 +92,12 @@ task axi_slave_driver::slave_write();
 
         //begin
           //  sema_data.get(1);
-                slave_write_data();
+               // slave_write_data();
             //sema_data.put(1);
         //end
 
         //begin
-            //slave_write_resp();
+            slave_write_resp();
        // end
     //join
     
@@ -386,11 +386,14 @@ task axi_slave_driver::slave_write_resp();
     forever begin
             int unsigned    rsp_count;
 
+            axi_seq_item_rsp = axi_sequence_item::type_id::create("axi_seq_item_rsp");
+
             wait(axi_vif.BREADY == 1'b1)
-            //@(posedge axi_vif.clock);
+            @(posedge axi_vif.clock);
         //seq_item_port.get_next_item(axi_seq_item_rsp);
         //begin
-            for(rsp_count = 0; rsp_count < axi_seq_item_rsp.AXI_AWLEN; rsp_count++) begin
+            for(rsp_count = 0; rsp_count < axi_seq_item_rsp.AXI_AWLEN; rsp_count++)
+            begin
                 if(rsp_count == axi_vif.AWLEN - 1)
                 begin
                     @(posedge axi_vif.clock);

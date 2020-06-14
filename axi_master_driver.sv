@@ -80,13 +80,13 @@ task axi_master_driver::master_write();
 
         //begin
           //  sema_data.get(1);
-                master_write_data();
+                //master_write_data();
             //sema_data.put(1);
         //end
 
         //begin
             //sema_resp.get(3);
-                //master_write_resp();
+                master_write_resp();
             //sema_resp.put(1);
         //end
     //join
@@ -177,7 +177,7 @@ task axi_master_driver::master_write_data();
         //seq_item_port.get_next_item(axi_seq_item_req);
         //begin
 
-        for(i = 0; i < axi_seq_item_req.AXI_AWLEN; i++) begin
+        for(i = 0; i < axi_seq_item_req.AXI_AWLEN; i++)
             //seq_item_port.get_next_item(axi_seq_item_req);
             begin
                 //axi_seq_item_req = axi_sequence_item::type_id::create("axi_seq_item_req");
@@ -202,7 +202,7 @@ task axi_master_driver::master_write_data();
                 //i = i + 1;
             end
             //seq_item_port.item_done();
-        end
+        
         
     end
 endtask: master_write_data

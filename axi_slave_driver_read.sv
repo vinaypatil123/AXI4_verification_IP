@@ -74,13 +74,13 @@ task axi_slave_driver_read::run_phase(uvm_phase phase);
         //seq_item_port.get_next_item(axi_seq_item_rsp);
 
         `uvm_info(get_type_name(), $sformatf("Slave Response"), UVM_NONE)
-        //fork          
-            //slave_read_address();
+        fork         
+            slave_read_address();
 
             slave_read_data();
 
             //slave_write_resp();
-        //join
+        join
         //axi_seq_item_rsp.print();
         //seq_item_port.item_done();
     end
@@ -341,29 +341,29 @@ task axi_slave_driver_read::slave_address();
 endtask: slave_address
 
 task axi_slave_driver_read::slave_read_data();
-    forever begin
+    begin
         int         i;
-        //axi_seq_item_rsp = axi_sequence_item_read::type_id::create("axi_seq_item_rsp");
+        axi_seq_item_rsp = axi_sequence_item_read::type_id::create("axi_seq_item_rsp");
             
         //axi_vif.WLAST           <=      1'b0;
         //axi_vif.WDATA           <=      1'b0;
         //axi_vif.WSTRB           <=      1'b0;
         //$display("Data at Slave = %0h", axi_seq_item_rsp.AXI_RDATA);
-        $display("Burst Len = %0t", axi_seq_item_rsp.AXI_ARLEN);
+        $display("Burst Len = %0d", axi_vif.ARLEN);
         //@(posedge axi_vif.clock);
         //seq_item_port.get_next_item(axi_seq_item_req);
         //begin
-        axi_vif.ARLEN           <=          axi_seq_item_rsp.AXI_ARLEN;
+        //axi_vif.ARLEN           <=          axi_seq_item_rsp.AXI_ARLEN;
 
-        for(i = 0; i < axi_seq_item_rsp.AXI_ARLEN; i++) begin
+        for(i = 0; i < axi_vif.ARLEN; i++)
             //seq_item_port.get_next_item(axi_seq_item_req);
             begin
-                //axi_seq_item_req = axi_sequence_item::type_id::create("axi_seq_item_req");
+                //axi_seq_item_rsp = axi_sequence_item_read::type_id::create("axi_seq_item_rsp");
 
                 //data_current            =       $urandom(axi_seq_item_req_data.AXI_WDATA);
                 axi_vif.RVALID          <=      1'b1;
-                axi_vif.RDATA           <=      axi_seq_item_rsp.mem_data_read[i];//data_current;
-                axi_vif.RLAST           <=      (i == axi_seq_item_rsp.AXI_ARLEN - 1)? 1'b1 : 1'b0;
+                axi_vif.RDATA           <=      axi_seq_item_rsp.mem_data_read[slave_rd_address_queue[i]];//data_current;
+                axi_vif.RLAST           <=      (i == axi_vif.ARLEN - 1)? 1'b1 : 1'b0;
 
                 //@(posedge axi_vif.clock);
                 $display("\t\tData %0d = %0h", i, axi_seq_item_rsp.mem_data_read[i]);
@@ -378,7 +378,7 @@ task axi_slave_driver_read::slave_read_data();
                 //i = i + 1;
             end
             //seq_item_port.item_done();
-        end
+        
         /*axi_sequence_item_read   axi_seq_item_rd_data;
         //int             data_at_slave;
         //axi_seq_item_rsp = axi_sequence_item_read::type_id::create("axi_seq_item_rsp");
